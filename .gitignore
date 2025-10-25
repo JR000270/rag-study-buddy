@@ -1,0 +1,19 @@
+# Python virtual environments
+.venv
+venv
+
+# Bytecode files
+__pycache__
+*.pyc
+
+# IDE files (e.g., VS Code)
+.vscode/
+
+# Streamlit/LlamaIndex caches
+.streamlit/
+.cache/
+
+# CRITICAL: Ignore API Key files
+helper.py
+api_key.env
+*.key
