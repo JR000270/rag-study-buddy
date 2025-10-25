@@ -17,3 +17,6 @@ __pycache__
 helper.py
 api_key.env
 *.key
+
+/documents/*
+!/documents/.gitkeep
