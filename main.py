@@ -69,15 +69,16 @@ def chat_room():
         #user input entry
         user_input = st.chat_input("Type message")
         if user_input:
+            #display user input
             st.session_state.messages.append({"role": "user", "content": user_input})
-
             with st.chat_message("user"):
                 st.markdown(user_input)
           
             #rag agents response
             r_response = asyncio.run(st.session_state.agent(user_input))
+
+            #display agents response
             st.session_state.messages.append({"role": "assistant", "content": r_response})
-            
             with st.chat_message("assistant"):
                 st.markdown(r_response)
                 st.rerun(scope="fragment")
@@ -102,5 +103,5 @@ if __name__ == "__main__":
         "Chat Room" : chat_room
     }
 
-    selected_page = st.sidebar.selectbox("Choose a page", options=page_names_to_funcs.keys())
+    selected_page = st.sidebar.selectbox("Choose a page", options=page_names_to_funcs.keys(), key= "current_page")
     page_names_to_funcs[selected_page]()
