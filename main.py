@@ -28,12 +28,18 @@ def chat_room():
         st.write("To get started just upload your necessary files for context and let me know what your topic is!\n")
 
         with st.form("setup_form", clear_on_submit=False):
+            
             uploaded_files = st.file_uploader(
                 "Upload documents", 
                 type=["txt","pdf", "csv"],
                 accept_multiple_files=True,
                 help = "File dropbox")
-            
+            if uploaded_files:
+                if len(uploaded_files) > 3:
+                    st.error("Please upload 3 or fewer files.")
+                else:
+                    st.success(f"{len(uploaded_files)} file(s) attached.")
+
             topic = st.text_input("What's the topic you need help with today?", help= "Topic input")
             
             submitted = st.form_submit_button("Start Chat")
@@ -69,6 +75,10 @@ def chat_room():
         #user input entry
         user_input = st.chat_input("Type message")
         if user_input:
+            #validate
+            if len(user_input.strip()) == 0 or len(user_input) > 250:
+                st.error("Please enter a valid message (1-250 characters).")
+                st.rerun(scope="fragment")
             #display user input
             st.session_state.messages.append({"role": "user", "content": user_input})
             with st.chat_message("user"):

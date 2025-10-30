@@ -119,7 +119,7 @@ def get_articles(topic: str):
         language='en',
         sort_by='relevancy',
         page=1,
-        page_size=5   # <-- limit to 5 results
+        page_size=7   # <-- limit to 7 results
     )
     #use the dictionary given by all_articles to get the links to the websites
     urls = [article['url'] for article in all_articles['articles']]

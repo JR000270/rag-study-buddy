@@ -3,25 +3,31 @@ from utils import get_doc_tools, get_articles
 import nest_asyncio
 import os
 from pathlib import Path
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core import Settings
 from llama_index.core.memory import Memory 
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.tools import FunctionTool
 from llama_index.core.base.llms.types import ChatMessage, MessageRole
+#from llama_index.core.callbacks import CallbackManager, TokenCountingHandler
+#import tiktoken
+
 nest_asyncio.apply()
 
 class agent:
     OPENAI_API_KEY = get_openai_api_key()
     Settings.openai_api_key = OPENAI_API_KEY
-    
+
     def __init__(self, llm_model: str ="gpt-3.5-turbo", verbose: bool = True, embed_model: str ="text-embedding-3-small", topic : str = ""):
         llm = OpenAI(model = llm_model)
         Settings.embed_model = OpenAIEmbedding(model= embed_model)
+        #self.token_counter = TokenCountingHandler(tokenizer= tiktoken.get_encoding("cl100k_base"))
+        #Settings.callback_manager = CallbackManager(handlers=[self.token_counter])
         
         self.download_count = 0
         self.download_limit = 5
+        #self.total_used_tokens = 0
         #Memory with 2000 token limit, 70% of tokens for raw messages not summarized by llm
         #higher ratio is set = more space for raw messages (more detailed memory)
         self.memory = Memory.from_defaults(
@@ -74,7 +80,6 @@ class agent:
     def get_tools(self, docs: list[str]) -> list:
         paper_to_tools_dict = {}
         for doc in docs:
-            #print(f"Getting tools for paper: {doc}")
             try:
                 vector_tool, summary_tool = get_doc_tools(doc, Path(doc).stem)
                 paper_to_tools_dict[doc] = [vector_tool, summary_tool]
@@ -135,8 +140,17 @@ class agent:
     #run a given input query through the agent workflow
     async def __call__(self, query: str) -> str:
         try:
-            #convert history 
+            #self.token_counter.reset_counts()
+            
+            #get response from workflow
             response = await self.workflow.run(user_msg = query, memory= self.memory)
+
+            # prompt_tokens = self.token_counter.prompt_llm_token_count
+            # completion_tokens = self.token_counter.completion_llm_token_count
+            # total_tokens = self.token_counter.total_llm_token_count
+
+            # token_info = f"Tokens: \nPrompt: {prompt_tokens} \nCompletion: {completion_tokens} \nTotal: {total_tokens}"
+
         except Exception as e:
             response = f"Error running agent: {e}"
-        return response
+        return response #+ "Ignore token info: \n\n" + token_info
