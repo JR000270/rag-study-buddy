@@ -20,6 +20,10 @@ from reportlab.lib.pagesizes import letter
 from newsapi import NewsApiClient
 from helper import get_news_api_key
 
+def load_css():
+    with open("style.css") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 def get_doc_tools(file_path: str, name: str) -> str:
     """Get vector query and summary query tools from a document."""
 
@@ -86,7 +90,7 @@ def website_to_txt(url: str, filename: str = "default.txt", save_dir: str = "doc
 
     #Testing start
     headers = {
-        # This header makes your request look like it's coming from a desktop browser
+        # This header makes the request look like it's coming from a desktop browser
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
     # Pass the headers to requests.get()
@@ -125,9 +129,8 @@ def get_articles(topic: str):
     urls = [article['url'] for article in all_articles['articles']]
     for i,url in enumerate(urls):
         try:
-            website_to_txt(url, f"test{i}.txt")
+            website_to_txt(url, f"context_file{i}.txt")
         except requests.exceptions.HTTPError as e:
-        #except Exception as e:
             print(f"Ran into an error converting website {i+1} to .txt: {e}")
         
 def download_uploaded_file(file: UploadedFile ) -> bool:
@@ -138,8 +141,6 @@ def download_uploaded_file(file: UploadedFile ) -> bool:
     with open(save_path, "wb") as f:
         f.write(file.getbuffer())
     
-    #confirm where the file has been saved to when it is saved
-    #st.success(f"File Downloaded to {save_path}")
     return os.path.isfile(save_path)
 
 def clear_docs():

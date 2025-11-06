@@ -14,7 +14,6 @@ __pycache__
 .cache/
 
 # CRITICAL: Ignore API Key files
-helper.py
 api_key.env
 *.key
 
