@@ -11,7 +11,7 @@ def intro():
     st.markdown("""
         <div class="custom-header fade-in">
             <h1>⚡ STUDY MUNCH AI ⚡</h1>
-            <p>Neural-Enhanced Learning Interface</p>
+            <p>RAG Agent Learning Interface</p>
         </div>
     """, unsafe_allow_html=True)
     
@@ -32,8 +32,8 @@ def intro():
             <div class="info-card fade-in">
                 <h3>⚙️ CORE FEATURES</h3>
                 <p>
-                    <strong>🔍 Neural Search</strong><br/>
-                    Automatically discovers and indexes relevant articles<br/><br/>
+                    <strong>🔍 Deeper Context</strong><br/>
+                    Automatically discovers and indexes relevant articles related to your topic<br/><br/>
                     </strong>
                     <strong>📊 Document Analysis</strong><br/>
                     Deep semantic understanding of your materials<br/><br/>
@@ -72,101 +72,16 @@ def intro():
                 <strong>STEP 1:</strong> Upload your study materials (PDFs, TXT, CSV)<br/>
                 <strong>STEP 2:</strong> Define your learning objective<br/>
                 <strong>STEP 3:</strong> Configure system parameters (optional)<br/>
-                <strong>STEP 4:</strong> Begin neural-enhanced learning session
+                <strong>STEP 4:</strong> Begin study session
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    st.info("👈 Navigate to **NEURAL CHAT** via sidebar to initialize your learning session")
+    st.info("👈 Navigate to **CHAT ROOM** via sidebar to initialize your learning session")
 
 
 @st.fragment()
 def chat_room():
-# Initialize session variables
-    #preface stage:
-    # if "setup_complete" not in st.session_state:
-    #     st.session_state.setup_complete = False
-    #     st.session_state.uploaded_files = []
-    #     st.session_state.topic = ""
-    
-    # #get user to upload any necessary context files and give it topic so gather information on
-    # if not st.session_state.setup_complete:
-    #     st.subheader("Welcome To Study Munch AI!")
-    #     st.write("To get started just upload your necessary files for context and let me know what your topic is!\n")
-
-    #     with st.form("setup_form", clear_on_submit=False):
-            
-    #         uploaded_files = st.file_uploader(
-    #             "Upload documents", 
-    #             type=["txt","pdf", "csv"],
-    #             accept_multiple_files=True,
-    #             help = "File dropbox")
-    #         if uploaded_files:
-    #             if len(uploaded_files) > 3:
-    #                 st.error("Please upload 3 or fewer files.")
-    #             else:
-    #                 st.success(f"{len(uploaded_files)} file(s) attached.")
-
-    #         topic = st.text_input("What's the topic you need help with today?", help= "Topic input")
-            
-    #         submitted = st.form_submit_button("Start Chat")
-    #         if submitted:
-    #             #needs a topic
-    #             if not topic.strip(): 
-    #                 st.error("Please give me a topic")
-    #             else: 
-    #                 #when files are uploaded
-    #                 if uploaded_files:
-    #                     for f in uploaded_files:
-    #                         download_uploaded_file(file = f)
-    #                 st.session_state.topic = topic
-    #                 get_articles(st.session_state.topic)
-    #                 st.session_state.setup_complete = True
-    #                 st.session_state.agent = rag_agent.agent(verbose=True, topic = st.session_state.topic)
-    #                 st.rerun(scope="fragment")
-
-    #the actual chat room
-    # else:
-    #     st.subheader(f"Munching on {st.session_state.topic.lower()}")
-    #     reset_conversation = st.button(label="New Conversation")
-        
-    #     if "messages" not in st.session_state:
-    #         st.session_state.messages = []
-
-    #     # Display the chat history
-    #     for entry in st.session_state.messages:
-    #         with st.chat_message(entry["role"]):
-    #             st.markdown(entry["content"])
-        
-
-    #     #user input entry
-    #     user_input = st.chat_input("Type message")
-    #     if user_input:
-    #         #validate
-    #         if len(user_input.strip()) == 0 or len(user_input) > 250:
-    #             st.error("Please enter a valid message (1-250 characters).")
-    #             st.rerun(scope="fragment")
-    #         #display user input
-    #         st.session_state.messages.append({"role": "user", "content": user_input})
-    #         with st.chat_message("user"):
-    #             st.markdown(user_input)
-          
-    #         #rag agents response
-    #         r_response = asyncio.run(st.session_state.agent(user_input))
-
-    #         #display agents response
-    #         st.session_state.messages.append({"role": "assistant", "content": r_response})
-    #         with st.chat_message("assistant"):
-    #             st.markdown(r_response)
-    #             st.rerun(scope="fragment")
-
-    #     #returns back to prefacing stage
-    #     if reset_conversation:
-    #         st.session_state.setup_complete = False
-    #         clear_docs()
-    #         st.session_state.messages = []
-    #         st.rerun(scope="fragment")
-    #NOTE new stuff below here:
     # Initialize session variables - preface stage
     if "setup_complete" not in st.session_state:
         st.session_state.setup_complete = False
@@ -191,13 +106,27 @@ def chat_room():
                 type=["txt","pdf", "csv"],
                 accept_multiple_files=True,
                 help="Maximum 3 files for optimal performance")
-            
+            max_file_size_mb = 1 * 1024 *1024 # 1 MB
             if uploaded_files:
+                # --- 1. Validate File Count ---
                 if len(uploaded_files) > 3:
-                    st.error("⚠️ LIMIT EXCEEDED: Maximum 3 files allowed")
+                    st.error(f"⚠️ LIMIT EXCEEDED: Maximum 3 files allowed")
+                    
                 else:
-                    st.success(f"✅ {len(uploaded_files)} FILE(S) LOADED SUCCESSFULLY")
-
+                    # --- 2. Validate File Size ---
+                    all_valid = True
+                    
+                    for file in uploaded_files:
+                        if file.size > max_file_size_mb:
+                            st.error(f"❌ FILE TOO LARGE: File '{file.name}' is {file.size / (1024 * 1024):.2f} MB. Maximum allowed is 1 MB.")
+                            all_valid = False
+                        
+                    # --- 3. Process Valid Files ---
+                    if all_valid:
+                        # Filter out files that were validated successfully
+                        valid_files = [file for file in uploaded_files if file.size <= max_file_size_mb]
+                        st.success(f"✅ {len(valid_files)} FILE(S) LOADED SUCCESSFULLY")
+          
             st.markdown('<div class="glow-divider"></div>', unsafe_allow_html=True)
             
             st.markdown("### 🎯 DEFINE LEARNING OBJECTIVE")
@@ -212,7 +141,7 @@ def chat_room():
             with st.expander("⚙️ ADVANCED CONFIGURATION"):
                 st.markdown("**MODEL SELECTION**")
                 model_choice = st.selectbox(
-                    "Neural Engine",
+                    "Agent Model",
                     options=["gpt-3.5-turbo", "gpt-4.1"],
                     index=0,
                     help="GPT-4.1: Superior reasoning | GPT-3.5: Faster, cost-efficient"
@@ -281,7 +210,7 @@ def chat_room():
         st.markdown(f"""
             <div class="custom-header fade-in">
                 <h1>⚡ MUNCHING ON: {st.session_state.topic.upper()} ⚡</h1>
-                <p>Neural interface ready for queries</p>
+                <p>Agent ready for queries</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -357,20 +286,8 @@ def chat_room():
 if __name__ == "__main__":
     load_css()
     atexit.register(clear_docs)# clear docs when done, crtl + C in terminal
-    # st.set_page_config(page_title="Study Munch AI")
-    # st.title("Study Munch")
-
-    # st.sidebar.title("Menu")
-    # page_names_to_funcs = {
-    #     "Welcome Page": intro,
-    #     "Chat Room" : chat_room
-    # }
-
-    # selected_page = st.sidebar.selectbox("Choose a page", options=page_names_to_funcs.keys(), key= "current_page")
-    # page_names_to_funcs[selected_page]()
-    #NOTE new stuff below here:
     st.set_page_config(
-        page_title="Study Munch AI - Neural Interface",
+        page_title="Study Munch AI - Agent Interface",
         page_icon="⚡",
         layout="wide",
         initial_sidebar_state="expanded"
@@ -380,7 +297,7 @@ if __name__ == "__main__":
     st.sidebar.markdown("""
         <div style='text-align: center; padding: 1.5rem; background: rgba(0, 255, 255, 0.05); border-radius: 15px; border: 2px solid rgba(0, 255, 255, 0.3); box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);'>
             <h1 style='color: #00ffff; text-shadow: 0 0 15px rgba(0, 255, 255, 0.8); margin: 0;'>⚡ STUDY MUNCH</h1>
-            <p style='color: rgba(0, 255, 255, 0.8); font-size: 0.9rem; margin-top: 0.5rem;'>Neural Learning Interface</p>
+            
         </div>
     """, unsafe_allow_html=True)
 
@@ -403,7 +320,7 @@ if __name__ == "__main__":
         <div style='padding: 1rem; background: rgba(0, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(0, 255, 255, 0.3);'>
             <p style='font-size: 0.85rem; margin: 0; color: rgba(0, 255, 255, 0.9);'>
                 <strong>⚡ SYSTEM TIP:</strong><br/>
-                Upload documents to enhance neural network knowledge base
+                Upload documents to enhance the agents knowledge base when you start your session!
             </p>
         </div>
     """, unsafe_allow_html=True)
