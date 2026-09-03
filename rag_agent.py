@@ -33,9 +33,12 @@ class agent:
         initial_tools = self.get_tools(self.docs())
         external_context_tool = self.get_external_context_tool()
         initial_tools.append(external_context_tool)
-
-        self.token_counter = TokenCountingHandler(tokenizer= tiktoken.encoding_for_model(llm_model))
-        #Settings.callback_manager = CallbackManager(handlers=[self.token_counter])
+        # TODO: wikipedia_tool = self.get_wikipedia_tool() -- re-enable once get_wikipedia_tool is finished and moved back inside the class
+        # initial_tools.append(wikipedia_tool)
+        #self.token_counter = TokenCountingHandler(tokenizer= tiktoken.encoding_for_model(llm_model))
+        tokenizer = tiktoken.encoding_for_model(llm_model).encode
+        self.token_counter = TokenCountingHandler(tokenizer=tokenizer)
+        Settings.callback_manager = CallbackManager(handlers=[self.token_counter])
         
         #adjust default temp to be better suited for educational context, increase max tokens for longer responses
         llm = OpenAI(model = llm_model, temperature= temperature, max_tokens= max_response_tokens)
@@ -75,10 +78,7 @@ class agent:
             "Aim for responses that are informative, clear, and thorough - typically 1-4 paragraphs unless "
             "the question specifically calls for a shorter response."
             "\n\nFor each question, follow this reasoning process:\n"
-            "THOUGHT: What information do I need to answer this?\n"
-            "ACTION: Which tool(s) should I use?\n"
-            "OBSERVATION: What did the tools tell me?\n"
-            "ANSWER: Synthesize the information into a helpful response\n"
+            "When you don't have enough information, use your tools to find it — but never expose your internal process to the user. Just deliver the answer naturally."
             "Example of a good response:\n"
             "User: What is photosynthesis?\n"
             "Assistant: Great question! Photosynthesis is the fascinating process that plants use "
@@ -175,7 +175,7 @@ class agent:
             self.workflow.tool_runner.add_tools(new_tools)
             self.download_count += 1
             
-            return f"Successfully found and added {len(new_docs)} new document(s) to the RAG context for the topic: '{query}'. You can now ask questions about them."
+            return f"Successfully found and added {len(new_docs)} new document(s) to the RAG context for the topic: '{query}'. Now use the relevant vector and summary tools to find the answer to the user's original question."
 
         # Return the FunctionTool wrapper
         return FunctionTool.from_defaults(
@@ -188,6 +188,33 @@ class agent:
             )
         )
     
+    # In your get_external_context_tool method, or as a new method:
+
+def get_wikipedia_tool(self):
+    def fetch_wikipedia_article(query: str) -> str:
+        """Fetches a Wikipedia article and adds it to the knowledge base."""
+        
+        if self.download_count >= self.download_limit:
+            return f"Download limit of {self.download_limit} reached."
+        
+        # TODO: 
+        # 1. Use the wikipedia package to search and get page content
+        #    (hint: wikipedia.search() and wikipedia.page())
+        # 2. Save the content to your documents/ directory
+        #    (you already have a pattern for this in website_to_txt)
+        # 3. Build tools from the new doc (get_doc_tools)
+        # 4. Add tools to self.workflow.tool_runner
+        # 5. Increment self.download_count
+        
+    return FunctionTool.from_defaults(
+        fn=fetch_wikipedia_article,
+        name="fetch_wikipedia_context",
+        description=(
+            # Think about what description would help the agent
+            # choose this tool vs the news tool at the right times
+        )
+    )
+
     def get_token_usage_info(self) -> dict:
         #returns token usage stats
         return {
@@ -215,7 +242,11 @@ class agent:
             response = await self.workflow.run(user_msg = query, memory= self.memory)
 
             total_query_tokens = self.token_counter.prompt_llm_token_count
+            query_completion_tokens = self.token_counter.completion_llm_token_count
             self.total_used_tokens += total_query_tokens
+            self.total_used_tokens += query_completion_tokens
+            print(f"____Tokens used in this query: {total_query_tokens}")
+            print(f"____Total tokens used so far: {self.total_used_tokens}")
 
             usage = self.get_token_usage_info()
             if usage["percent_of_limit_used"] > 75:

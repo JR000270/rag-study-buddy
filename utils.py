@@ -109,7 +109,7 @@ def website_to_txt(url: str, filename: str = "default.txt", save_dir: str = "doc
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(text_content)
 
-    print(f"Saved {filename}.txt to: {output_path}")
+    print(f"Saved {filename} to: {output_path}")
     return output_path
 
 #collect files for context on topic

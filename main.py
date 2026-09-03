@@ -10,7 +10,7 @@ def intro():
      # Custom header with cyberpunk vibe
     st.markdown("""
         <div class="custom-header fade-in">
-            <h1>⚡ STUDY MUNCH AI ⚡</h1>
+            <h1> STUDY MUNCH </h1>
             <p>RAG Agent Learning Interface</p>
         </div>
     """, unsafe_allow_html=True)
@@ -18,7 +18,7 @@ def intro():
     # Welcome content in glowing cards
     st.markdown("""
         <div class="info-card fade-in">
-            <h2>🚀 SYSTEM ACTIVE</h2>
+            <h2>Agent Active</h2>
             <p>Welcome to the next generation of AI-powered learning. Study Munch AI combines advanced RAG technology with intelligent document analysis to create your ultimate study companion.</p>
         </div>
     """, unsafe_allow_html=True)
@@ -30,15 +30,15 @@ def intro():
     with col1:
         st.markdown("""
             <div class="info-card fade-in">
-                <h3>⚙️ CORE FEATURES</h3>
+                <h3>Features</h3>
                 <p>
-                    <strong>🔍 Deeper Context</strong><br/>
+                    <strong>Deeper Context</strong><br/>
                     Automatically discovers and indexes relevant articles related to your topic<br/><br/>
                     </strong>
-                    <strong>📊 Document Analysis</strong><br/>
+                    <strong>Document Analysis</strong><br/>
                     Deep semantic understanding of your materials<br/><br/>
                     </strong>
-                    <strong>🧠 Adaptive Memory</strong><br/>
+                    <strong>Adaptive Memory</strong><br/>
                     Context-aware conversation tracking
                     </strong>
                 </p>
@@ -48,15 +48,15 @@ def intro():
     with col2:
         st.markdown("""
             <div class="info-card fade-in">
-                <h3>🎯 CAPABILITIES</h3>
+                <h3>Capabilities</h3>
                 <p>
-                    <strong>💬 Intelligent Dialogue</strong><br/>
+                    <strong>Intelligent Dialogue</strong><br/>
                     Not just Q&A - real conversations<br/><br/>
                     </strong>
-                    <strong>🎨 Customizable</strong><br/>
+                    <strong>Customizable</strong><br/>
                     Adjust response style and depth<br/><br/>
                     </strong>
-                    <strong>⚡ Real-Time Learning</strong><br/>
+                    <strong>Real-Time Learning</strong><br/>
                     Fetch fresh information on demand
                     </strong>
                 </p>
@@ -67,7 +67,7 @@ def intro():
     
     st.markdown("""
         <div class="info-card fade-in pulse-glow">
-            <h3>🎓 HOW TO ACTIVATE</h3>
+            <h3>How To Use</h3>
             <p>
                 <strong>STEP 1:</strong> Upload your study materials (PDFs, TXT, CSV)<br/>
                 <strong>STEP 2:</strong> Define your learning objective<br/>
@@ -77,7 +77,7 @@ def intro():
         </div>
     """, unsafe_allow_html=True)
     
-    st.info("👈 Navigate to **CHAT ROOM** via sidebar to initialize your learning session")
+    st.info("Navigate to chat room via sidebar to initialize your session")
 
 
 @st.fragment()
@@ -92,13 +92,13 @@ def chat_room():
     if not st.session_state.setup_complete:
         st.markdown("""
             <div class="custom-header fade-in">
-                <h1>⚡ SYSTEM CONFIGURATION ⚡</h1>
+                <h1>Configuration</h1>
                 <p>Initialize your learning parameters</p>
             </div>
         """, unsafe_allow_html=True)
 
         with st.form("setup_form", clear_on_submit=False):
-            st.markdown("### 📂 UPLOAD CONTEXT FILES")
+            st.markdown("### Upload Study Materials")
             st.markdown("*Enhance the knowledge base with your materials*")
             
             uploaded_files = st.file_uploader(
@@ -110,7 +110,7 @@ def chat_room():
             if uploaded_files:
                 # --- 1. Validate File Count ---
                 if len(uploaded_files) > 3:
-                    st.error(f"⚠️ LIMIT EXCEEDED: Maximum 3 files allowed")
+                    st.error(f"Maximum 3 files allowed")
                     
                 else:
                     # --- 2. Validate File Size ---
@@ -118,18 +118,11 @@ def chat_room():
                     
                     for file in uploaded_files:
                         if file.size > max_file_size_mb:
-                            st.error(f"❌ FILE TOO LARGE: File '{file.name}' is {file.size / (1024 * 1024):.2f} MB. Maximum allowed is 1 MB.")
-                            all_valid = False
-                        
-                    # --- 3. Process Valid Files ---
-                    if all_valid:
-                        # Filter out files that were validated successfully
-                        valid_files = [file for file in uploaded_files if file.size <= max_file_size_mb]
-                        st.success(f"✅ {len(valid_files)} FILE(S) LOADED SUCCESSFULLY")
+                            st.error(f"File too large: File '{file.name}' is {file.size / (1024 * 1024):.2f} MB. Maximum allowed is 1 MB.")
           
             st.markdown('<div class="glow-divider"></div>', unsafe_allow_html=True)
             
-            st.markdown("### 🎯 DEFINE LEARNING OBJECTIVE")
+            st.markdown("### Goal")
             topic = st.text_input(
                 "Subject Area", 
                 placeholder="Enter your study topic...",
@@ -138,8 +131,8 @@ def chat_room():
             st.markdown('<div class="glow-divider"></div>', unsafe_allow_html=True)
             
             # Advanced settings
-            with st.expander("⚙️ ADVANCED CONFIGURATION"):
-                st.markdown("**MODEL SELECTION**")
+            with st.expander("Advanced"):
+                st.markdown("**model selection**")
                 model_choice = st.selectbox(
                     "Agent Model",
                     options=["gpt-3.5-turbo", "gpt-4.1"],
@@ -147,7 +140,7 @@ def chat_room():
                     help="GPT-4.1: Superior reasoning | GPT-3.5: Faster, cost-efficient"
                 )
                 
-                st.markdown("**RESPONSE PARAMETERS**")
+                st.markdown("**response parameters**")
                 
                 temperature = st.slider(
                     "Creativity Index",
@@ -167,7 +160,7 @@ def chat_room():
                     help="~750 tokens ≈ 500 words"
                 )
                 
-                st.markdown("**SESSION LIMITS**")
+                st.markdown("**Session Limits**")
                 token_limit = st.number_input(
                     "Total token budget", 
                     min_value=1000, 
@@ -179,14 +172,14 @@ def chat_room():
             
             st.markdown('<div class="glow-divider"></div>', unsafe_allow_html=True)
             
-            submitted = st.form_submit_button("🚀 INITIALIZE SYSTEM", use_container_width=True)
+            submitted = st.form_submit_button("Start Studying", use_container_width=True)
             
             if submitted:
                 # Needs a topic
                 if not topic.strip(): 
-                    st.error("⚠️ ERROR: Learning objective required")
+                    st.error("Error: Goal required")
                 else: 
-                    with st.spinner("⚡ INITIALIZING AGENT..."):
+                    with st.spinner("Starting Agent..."):
                         # When files are uploaded
                         if uploaded_files:
                             for f in uploaded_files:
@@ -202,14 +195,14 @@ def chat_room():
                             temperature=temperature,
                             max_response_tokens=max_response_tokens
                         )
-                    st.success("✅ SYSTEM ONLINE")
+                    st.success("Agent is ready!")
                     st.rerun(scope="fragment")
 
     # The actual chat room
     else:
         st.markdown(f"""
             <div class="custom-header fade-in">
-                <h1>⚡ MUNCHING ON: {st.session_state.topic.upper()} ⚡</h1>
+                <h1>Munching on: {st.session_state.topic.upper()} ⚡</h1>
                 <p>Agent ready for queries</p>
             </div>
         """, unsafe_allow_html=True)
@@ -242,7 +235,7 @@ def chat_room():
         # Control panel
         col1, col2, col3 = st.columns([1, 3, 1])
         with col1:
-            reset_conversation = st.button("🔄 NEW SESSION", use_container_width=True)
+            reset_conversation = st.button("New Session", use_container_width=True)
         
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -253,12 +246,12 @@ def chat_room():
                 st.markdown(entry["content"])
         
         # User input entry
-        user_input = st.chat_input("⚡ Enter your query...")
+        user_input = st.chat_input("Enter your question...")
         
         if user_input:
             # Validate
-            if len(user_input.strip()) == 0 or len(user_input) > 500:
-                st.error("⚠️ INPUT ERROR: Message must be 1-500 characters")
+            if len(user_input.strip()) == 0 or len(user_input) > 2000:
+                st.error("Input Error: Message must be < 2000 characters")
                 st.rerun(scope="fragment")
             
             # Display user input
@@ -267,7 +260,7 @@ def chat_room():
                 st.markdown(user_input)
           
             # RAG agent's response
-            with st.spinner("🧠 MUNCHING QUERY..."):
+            with st.spinner("Munching..."):
                 r_response = asyncio.run(st.session_state.agent(user_input))
             st.session_state.messages.append({"role": "assistant", "content": r_response})
             # Display agent's response
@@ -304,12 +297,12 @@ if __name__ == "__main__":
     st.sidebar.markdown('<div class="glow-divider"></div>', unsafe_allow_html=True)
     
     page_names_to_funcs = {
-        "🏠 Welcome Page": intro,
-        "💬 Chat Room": chat_room
+        "Welcome Page": intro,
+        "Chat Room": chat_room
     }
 
     selected_page = st.sidebar.selectbox(
-        "NAVIGATION",
+        "Navigation",
         options=page_names_to_funcs.keys(),
         key="current_page"
     )
@@ -319,7 +312,7 @@ if __name__ == "__main__":
     st.sidebar.markdown("""
         <div style='padding: 1rem; background: rgba(0, 255, 255, 0.05); border-radius: 12px; border: 1px solid rgba(0, 255, 255, 0.3);'>
             <p style='font-size: 0.85rem; margin: 0; color: rgba(0, 255, 255, 0.9);'>
-                <strong>⚡ SYSTEM TIP:</strong><br/>
+                <strong>Tip:</strong><br/>
                 Upload documents to enhance the agents knowledge base when you start your session!
             </p>
         </div>
@@ -329,7 +322,7 @@ if __name__ == "__main__":
     
     st.sidebar.markdown("""
         <div style='text-align: center; padding: 0.5rem; color: rgba(0, 255, 255, 0.5); font-size: 0.75rem;'>
-            SYSTEM STATUS: <span style='color: #00ff66;'>●</span> ONLINE
+            Status: <span style='color: #00ff66;'>●</span> ONLINE
         </div>
     """, unsafe_allow_html=True)
     
